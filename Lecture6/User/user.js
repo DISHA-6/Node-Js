@@ -1,6 +1,6 @@
 const fs=require('fs');
 const userRequestHandler=(req,res)=>{
-  console.log(req.urll,req.method);
+  console.log(req.url,req.method);
   if(req.url==='/'){
     res.setHeader('Content-Type','text/html');
     res.write('<h1>Welcome to the Home Page!</h1>');
@@ -25,27 +25,27 @@ const userRequestHandler=(req,res)=>{
       const fullBody=Buffer.concat(body).toString();
       console.log(fullBody);
       const params=new URLSearchParams(fullBody);
-      // const bodyObject={};
-      // for(const [key,val] of params.entries()){
-      //   bodyObject[key]=val;
-      // }
       const bodyObject=Object.fromEntries(params);
       console.log(bodyObject);
       //output:{"name":"Disha Makal "gender":"female"}
-      fs.writeFileSync('user.txt',JSON.stringify(bodyObject));//Blocks Everything until file is written
+      //fs.writeFileSync('user.txt',JSON.stringify(bodyObject));//Blocks Everything until file is written
+      //Non Blocking Code(Async code)
+      fs.writeFile('user.txt',JSON.stringify(bodyObject),error=>{
+        console.log('Data written Succesfuly!');
+        res.statusCode=302;//redirection code
+        res.setHeader('Location','/');
+        return res.end();
+      });
     });
-    
-    res.statusCode=302;//redirection code
-    res.setHeader('Location','/');
-    return res.end();
   }
-  
+  else{
   res.setHeader('Content-Type','text/html');
   res.write('<html>');
   res.write('<head><title>My First Page</title></head>');
   res.write('<body><h1>Hello</h1></body>');
   res.write('</html>');
   res.end();//to end response
+  }
 };
 module.exports=userRequestHandler;
 
